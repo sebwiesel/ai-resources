@@ -58,6 +58,22 @@ A clear overview of how AI agents work, including architecture patterns, limitat
 
 ---
 
+
+
+# 📊 Earnings Call Transcript API Providers
+
+| Provider | API Access | Free Tier | Data Quality | Coverage | Key Features | Best For |
+|----------|-----------|-----------|-------------|----------|--------------|----------|
+| **Quartr API** | ✅ Yes | ❌ No | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ (13k+ companies) | Real-time transcripts, audio, speaker labels, summaries | Production apps, fintech |
+| **FactSet** | ✅ Yes (enterprise APIs / feeds) | ❌ No | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | Near real-time transcripts, XML, audio, structured metadata | Institutional / quant systems |
+| **Bloomberg** | ⚠️ Limited (enterprise only) | ❌ No | ⭐⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ | Terminal + enterprise feeds, transcripts in document ecosystem | Large firms already using Bloomberg |
+| **Financial Modeling Prep (FMP)** | ✅ Yes | ✅ Limited free | ⭐⭐⭐ | ⭐⭐⭐ | Real-time transcripts API, bulk endpoints, affordable pricing | Startups / hobby → semi-prod |
+| **Alpha Vantage** | ✅ Yes | ✅ Free | ⭐⭐ | ⭐⭐ | Transcript endpoint + sentiment signals | Lightweight apps, experimentation |
+| **API Ninjas** | ✅ Yes | ⚠️ Limited free | ⭐⭐⭐ | ⭐⭐⭐ | 8k+ companies, structured transcripts, sentiment & participants | Simple integrations |
+| **Yahoo Finance** | ❌ No official API | ✅ Free | ⭐⭐⭐ | ⭐⭐⭐ | Web transcripts for some companies, earnings calendar, news integration | Manual lookup / scraping |
+| **Seeking Alpha (unofficial)** | ❌ No official API | ✅ Free (scraping) | ⭐⭐⭐⭐ | ⭐⭐⭐⭐ | High-quality transcripts w/ speakers | DIY pipelines |
+| **Company IR sites** | ❌ No | ✅ Free | ⭐⭐⭐⭐ | ⭐⭐⭐ | Official transcripts (PDF/HTML) | Custom scraping |
+
 ## 🧪 Experiments / Ideas
 
 *(To be expanded — add internal experiments, prototypes, and learnings here)*
