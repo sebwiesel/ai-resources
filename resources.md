@@ -10,7 +10,7 @@ Focused on practical usage, fast learning, and staying up-to-date.
 ### AutoGPT
 https://github.com/Significant-Gravitas/AutoGPT
 
-One of the first widely adopted autonomous AI agent frameworks. It allows LLMs to plan, execute tasks, and iterate with minimal human input. Useful for understanding agent loops and task automation patterns.
+One of the first adopted autonomous AI agent frameworks. It allows LLMs to plan, execute tasks, and iterate with minimal human input. Useful for understanding agent loops and task automation patterns.
 
 ---
 
