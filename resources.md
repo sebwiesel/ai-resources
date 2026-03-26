@@ -110,3 +110,4 @@ Suggested additions for this section:
 - Prompt workflows that worked well
 - Evaluation setups and benchmarks
 - Lessons learned from production integrations
+- https://www.youtube.com/watch?v=foMJtBLh2xM
