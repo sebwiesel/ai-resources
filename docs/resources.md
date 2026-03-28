@@ -33,6 +33,19 @@ https://github.com/heilcheng/awesome-agent-skills
 
 A curated list of reusable agent capabilities and skill patterns. Useful for discovering packaging conventions and practical workflow ideas.
 
+## MCPs
+
+
+## MCPs
+
+### mail-mcp  
+https://github.com/dastrobu/mail-mcp
+
+mail-mcp is a local MCP server that connects AI assistants to macOS Mail.app, letting them read, search, and draft emails through a structured interface without needing external credentials.
+
+It uses macOS automation (JXA/AppleScript) to safely bridge AI and Apple Mail, enabling powerful on-device email workflows while keeping data local and user-controlled.
+
+
 ## Core Repositories and Frameworks
 
 ### Anthropic on GitHub
@@ -99,3 +112,5 @@ Suggested additions for this section:
 - Prompt workflows that performed well in practice
 - Evaluation setups and benchmark notes
 - Lessons learned from production integrations
+
+
