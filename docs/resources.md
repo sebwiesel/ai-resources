@@ -241,7 +241,9 @@ Suggested additions:
 
 ---
 
-If you want, I can also:
+https://github.com/NeuroDong/Ai-Review/blob/main/ai-review-skills/SKILL.md
+https://github.com/BevalZ/awesome-prompt-for-academic?tab=readme-ov-file#-categories-overview
+
 
 * Turn this into a **Notion-ready version**
 * Add **“when to use what” decision guidance**
