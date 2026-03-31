@@ -1,0 +1,170 @@
+---
+name: earnings-call-analysis
+description: Retrieve, store, and comparatively analyze the two most recent quarterly earnings call transcripts for a publicly listed company. Use this skill whenever the user mentions an earnings call, earnings transcript, quarterly results analysis, earnings comparison, or asks things like "pull the latest earnings for MSFT", "analyze NVDA's last two quarters", "earnings call for Tesla", "what did management say last quarter", or "compare recent earnings". Also trigger when the user names a public company and asks about recent financial performance, guidance changes, or management commentary. This skill handles local caching of transcripts in markdown, web retrieval when missing, and structured comparative analysis — equities only, not fixed income or funds.
+---
+
+# Earnings Call Analysis
+
+Retrieve and comparatively analyze the two most recent quarterly earnings call transcripts for a given public company.
+
+## Storage Convention
+
+- **Base path:** `/home/claude/earnings/`
+- **Per-company folder:** `/home/claude/earnings/{TICKER}/`
+- **Filename format:** `{TICKER}_Q{N}_{YEAR}.md` (e.g., `MSFT_Q2_2026.md`)
+- Quarters follow calendar convention: Q1 = Jan–Mar, Q2 = Apr–Jun, Q3 = Jul–Sep, Q4 = Oct–Dec
+- Some companies use fiscal year quarters that differ from calendar quarters (e.g., Apple's FY Q2 = Jan–Mar). When fetching transcripts, use the **reporting quarter as the company labels it** in their earnings release, but note the fiscal/calendar mapping in the file header.
+
+## Workflow
+
+### Phase 1 — Resolve Company
+
+Convert the user's input into a standard ticker and company name. The user might say "Microsoft", "MSFT", "msft", or "microsoft corp" — normalize to uppercase ticker.
+
+If the input is ambiguous (e.g., "Meta" could theoretically be multiple things), confirm with the user before proceeding.
+
+Determine the two most recent reporting quarters based on today's date. Earnings are typically released 3–6 weeks after quarter-end, so:
+- If today is mid-February, the most recent available quarter is likely Q4 of the prior year, and the previous is Q3.
+- If today is early January, Q3 might be the most recent with full transcript available.
+
+Use judgment — the web search in Phase 3 will confirm what's actually available.
+
+### Phase 2 — Check Local Cache
+
+```
+Check: /home/claude/earnings/{TICKER}/
+```
+
+1. List the directory contents (create the folder if it doesn't exist).
+2. Parse filenames to identify which quarterly transcripts are already stored.
+3. Determine if the two most recent quarters are both present.
+
+**Outcomes:**
+- **Both exist** → Skip to Phase 4.
+- **One exists** → Fetch only the missing one in Phase 3.
+- **Neither exists** → Fetch both in Phase 3.
+- **Folder has transcripts but they're older than expected** → The two most recent available quarters might be what's stored. Confirm with the user: "I have Q1 and Q2 2025 on file. Want me to check if newer transcripts are available?"
+
+### Phase 3 — Fetch Missing Transcripts
+
+For each missing transcript:
+
+1. **Search** — Use web_search with queries like:
+   - `{Company} Q{N} {YEAR} earnings call transcript`
+   - `{TICKER} quarterly earnings transcript {YEAR}`
+   - Try 2–3 query variations if the first doesn't return good results.
+
+2. **Select source** — Prioritize full-text transcript sources. Good sources include Motley Fool transcripts, Seeking Alpha (often paywalled but sometimes accessible), company investor relations pages, and financial news sites that publish full transcripts. Avoid sources that only have summaries or commentary.
+
+3. **Extract** — Use web_fetch on the best result. Extract the transcript content and convert to clean markdown. The stored file should include:
+
+```markdown
+# {Company Name} ({TICKER}) — Q{N} {YEAR} Earnings Call Transcript
+
+**Date:** {date of the call}
+**Source:** {URL where transcript was found}
+**Retrieved:** {today's date}
+
+---
+
+## Participants
+{List of executives and analysts if available}
+
+## Prepared Remarks
+{Management's prepared remarks}
+
+## Q&A Session
+{Analyst questions and management responses}
+```
+
+4. **Store** — Save as `/home/claude/earnings/{TICKER}/{TICKER}_Q{N}_{YEAR}.md`
+
+5. **Copyright awareness** — Earnings call transcripts are factual records of public corporate communications. Store them as reference material for the user's personal research use. Extract and restructure the content rather than copying entire pages verbatim from any single source.
+
+**If a transcript cannot be found:** Tell the user clearly what you searched for and that the transcript isn't available online in accessible form. Stop the workflow — do not proceed with partial analysis unless the user explicitly asks to analyze just the one available transcript.
+
+### Phase 4 — Load and Analyze
+
+Read both markdown files into context. Then produce a structured comparative analysis.
+
+**Process order matters here.** Work through the detailed analysis sections first — these are the deep reading. Only after completing all four sections, write the summary. The summary must be informed by the full analysis, not written upfront and padded afterward. Think of it like a research process: do the work, then tell the reader what you found.
+
+**However, the final presented document places the summary on top.** The reader sees the summary first, detailed sections below. Structure the output as follows:
+
+#### Summary
+Write this last, present it first. A concise executive overview (3–5 sentences) that distills the most important findings from the four sections below. Cover the single most significant shift, the key new development or risk, and the overall direction of the company's trajectory. This should feel like a sharp conclusion — because it is one.
+
+#### KPI Comparison Table
+
+Immediately after the summary, present a side-by-side comparison table of key performance indicators across the two quarters. This table should be the reader's quantitative anchor — the hard numbers behind the narrative.
+
+The table has three columns: **Metric**, **Previous Quarter**, **Latest Quarter**. Include a **Δ (change)** column where a meaningful delta can be computed (percentage change, absolute change, or directional arrow).
+
+Include two categories of metrics:
+
+**Financial metrics** — extract every quantitative figure management disclosed:
+- Revenue (absolute and growth rate)
+- Gross margin
+- Operating margin
+- EPS
+- ROE
+- Free cash flow
+- CapEx (absolute and as % of revenue)
+- Forward guidance (revenue range, margin range)
+- Dividend per share or total payout
+- Any segment-level revenue breakdowns provided (by platform, geography, technology node, etc.)
+
+**Predictive and operationally relevant metrics** — these are non-financial or semi-financial indicators that are highly predictive of future performance. Which metrics matter depends on the company and industry, so use judgment. Examples:
+- For a semiconductor foundry: capacity utilization, technology mix (% advanced nodes), CapEx per wafer-start, customer engagement lead times, advanced packaging revenue share
+- For a SaaS company: ARR, net revenue retention, customer count, churn rate
+- For a retailer: same-store sales, inventory turns, average ticket size
+- For a bank: NIM, loan growth, NPL ratio, CET1 ratio
+- Also include: forward growth guidance, long-term CAGR targets, any updated multi-year outlooks, headcount or capacity metrics if disclosed
+
+Extract every number that was explicitly stated in either call. If a metric was disclosed in one quarter but not the other, show it with a "—" for the missing quarter. Do not estimate or infer numbers that weren't stated.
+
+This table uses markdown table formatting and sits right after the summary as a quantitative reference before the reader moves into the narrative analysis.
+
+---
+
+#### New Developments
+What came up in the more recent call that wasn't discussed at all in the previous one? This includes new products, market entries, acquisitions, partnerships, strategic pivots, new capital allocation plans, or entirely new themes management introduced. Focus on substance — if management mentioned something in passing vs. dedicating real airtime to it, note the difference.
+
+#### Resolved Issues
+Problems, risks, or concerns that were raised in the previous quarter's call but are no longer present or have been explicitly addressed in the latest call. Did supply chain issues clear up? Did a regulatory overhang get resolved? Did a product delay ship? Identify what dropped off the worry list and whether management explicitly claimed resolution or simply stopped mentioning it.
+
+#### Newly Emerged Issues
+The inverse — problems, risks, or headwinds that appeared in the latest call but were absent from the previous one. New competitive threats, margin pressures, regulatory scrutiny, macro concerns, customer churn signals, or anything that analysts pressed on in Q&A that wasn't a topic before. Flag whether these were raised by management proactively or surfaced through analyst questions (the latter often signals the issue is already on the market's radar).
+
+#### Changes in Sentiment
+How did the overall tone shift between the two calls? Compare management's confidence level, the language around guidance (cautious vs. optimistic), analyst tone in Q&A (supportive vs. skeptical), and any notable changes in how management frames challenges. Look for shifts from defensive to offensive posture (or vice versa), changes in how frequently hedging language appears, and whether the Q&A session felt collaborative or adversarial compared to the prior quarter.
+
+#### Analyst Q&A Index
+
+For each earnings call, provide a bullet point list of every sell-side analyst question asked during the Q&A session. Format:
+
+- **Analyst Name (Firm) — Q1:** One-sentence summary of the question. **Answer:** One- to two-sentence summary of management's response.
+- **Analyst Name (Firm) — Q2:** ...
+
+Do this for both calls, clearly labeled (e.g., "Q3 2025 Q&A" and "Q4 2025 Q&A"). This section is a reference index — keep it tight and factual. Every question that was asked should appear, even if the answer was a deflection. This section uses bullet points by design (it's a structured reference list, not prose).
+
+---
+
+Present the four comparative analysis sections (New Developments, Resolved Issues, Newly Emerged Issues, Changes in Sentiment) and the Summary in prose paragraphs, not bullet lists — the goal is an analyst-quality briefing note that reads like a research memo. The KPI Comparison Table and Analyst Q&A Index are exceptions: they use structured table/bullet formatting as reference appendices.
+
+### Phase 5 — Chat Mode
+
+After presenting the analysis, invite the user to ask follow-up questions about either transcript. The full text of both calls is in context, so the user can ask about specific topics, segments, analyst questions, or dig into details that the summary didn't cover.
+
+Useful prompts to suggest:
+- "What did they say about {specific segment/product}?"
+- "How did the CFO characterize margins?"
+- "Were there any analyst questions about {topic}?"
+- "What's the biggest change in narrative between the two calls?"
+
+## Edge Cases
+
+- **Company just IPO'd** — Only one earnings call may exist. Tell the user and offer single-quarter analysis.
+- **Earnings call hasn't happened yet** — If the most recent quarter's call hasn't occurred, use the two most recent available.
+- **Non-US companies** — Some report semi-annually. Adapt: fetch the two most recent available reporting periods.
+- **User asks for specific quarters** — If the user says "compare Q1 2025 vs Q3 2024", honor that instead of defaulting to the two most recent.
